@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cropping GUI</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="top-bar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <svg class="brand-icon" viewBox="0 0 24 24" role="presentation" focusable="false">
+              <rect
+                x="3"
+                y="3"
+                width="18"
+                height="18"
+                rx="3"
+                ry="3"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.3"
+                stroke-dasharray="3.5 3.2"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <div class="brand-title">Cropping GUI</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button id="loadFolderBtn" class="ghost">Load folder</button>
+          <button id="outputFolderBtn" class="ghost">Set output</button>
+          <button id="clearSelectionsBtn" class="ghost">Clear selections</button>
+        </div>
+        <div class="status">
+          <div class="status-line" id="inputStatus">Input: —</div>
+          <div class="status-line" id="outputStatus">Output: —</div>
+        </div>
+      </header>
+
+      <section class="workspace">
+        <aside class="panel left">
+          <div class="panel-heading">
+            <h2>Library</h2>
+            <span id="libraryCount" class="chip">0</span>
+          </div>
+          <div id="thumbnailGrid" class="thumbnail-grid"></div>
+        </aside>
+
+        <main class="editor">
+          <div class="editor-header">
+            <div class="title-group">
+              <div class="eyebrow">Current image</div>
+              <div id="imageName" class="title">No image loaded</div>
+            </div>
+            <div class="meta">
+              <div id="imageResolution" class="meta-chip">Resolution: —</div>
+              <div id="activeResolution" class="meta-chip muted">Crop: overlay</div>
+            </div>
+          </div>
+
+          <div class="canvas-shell">
+            <div class="canvas-inner">
+              <img id="mainImage" class="main-image hidden" alt="Selected source" />
+              <div id="overlay"></div>
+            </div>
+            <div class="empty-state" id="emptyState">
+              <div class="empty-title">Load a folder to start cropping</div>
+              <div class="empty-copy">Two-column gallery on the left, crops on the right.</div>
+            </div>
+          </div>
+
+          <div class="editor-footer">
+            <div class="hint">Drag to create rectangles. Alt+drag handles to resize. Ctrl+drag to move. Enter to accept.</div>
+            <div class="actions">
+              <button id="skipBtn" class="ghost">Skip</button>
+              <button id="acceptBtn" class="primary">Accept (Enter)</button>
+            </div>
+          </div>
+        </main>
+
+        <aside class="panel right">
+          <div class="panel-heading">
+            <h2>Crops</h2>
+            <span id="cropCount" class="chip">0</span>
+          </div>
+          <div id="cropList" class="crop-list"></div>
+
+          <div class="panel-divider"></div>
+
+          <div class="panel-heading">
+            <h2>Settings</h2>
+          </div>
+          <div class="settings">
+            <label class="toggle">
+              <input type="checkbox" id="snapResolution" checked />
+              <span class="toggle-label">Snap to resolution buckets</span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="snapAspect" />
+              <span class="toggle-label">Lock to aspect ratios</span>
+            </label>
+            <div class="field">
+              <label for="snapStrength">Snap strength</label>
+              <div class="slider-row">
+                <input id="snapStrength" type="range" min="0" max="1" step="0.05" value="1" />
+                <span id="snapStrengthValue" class="slider-value">1.0</span>
+              </div>
+            </div>
+            <div class="field">
+              <label for="bucketInput">Buckets (comma separated)</label>
+              <input id="bucketInput" type="text" value="512, 768, 1024" />
+            </div>
+            <div class="field">
+              <label for="aspectInput">Aspect ratios</label>
+              <input
+                id="aspectInput"
+                type="text"
+                value="1:1, 4:3, 3:2, 16:9, 9:16, 1:2, 2:1, 1:3, 3:1, 2:3, 3:2, 1:4, 4:1, 9:21, 21:9, 9:32, 32:9"
+              />
+            </div>
+          </div>
+        </aside>
+      </section>
+    </div>
+
+    <script type="module" src="./renderer.js"></script>
+  </body>
+</html>

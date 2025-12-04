@@ -1,0 +1,46 @@
+# Dependencies and package managers
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+logs/
+*.log
+debug.log
+
+# Build and distribution outputs
+dist/
+out/
+build/
+release/
+release-builds/
+
+# Test and coverage outputs
+coverage/
+.nyc_output/
+coverage-final.json
+lcov.info
+
+# Electron and packaging artifacts
+*.asar
+.cache/
+.electron/
+.parcel-cache/
+*.tsbuildinfo
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.vs/
+*.iml
+desktop.ini
+*.swp
+*.tmp
+*.orig
+
+# Environment / local overrides
+.env
+.env.*
