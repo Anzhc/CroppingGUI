@@ -1,0 +1,12 @@
+appId: "com.anzhc.croppinggui"
+productName: "Cropping GUI"
+directories:
+  output: "dist_electron"
+files:
+  - "src/**/*"
+  - "main.js"
+  - "preload.js"
+win:
+  artifactName: "CroppingGUI-${version}.${ext}"
+  target:
+    - "zip"

@@ -11,6 +11,7 @@ debug.log
 
 # Build and distribution outputs
 dist/
+dist_electron/
 out/
 build/
 release/
