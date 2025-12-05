@@ -6,6 +6,7 @@ const elements = {
   acceptBtn: document.getElementById('acceptBtn'),
   thumbnailGrid: document.getElementById('thumbnailGrid'),
   mainImage: document.getElementById('mainImage'),
+  canvasInner: document.querySelector('.canvas-inner'),
   overlay: document.getElementById('overlay'),
   imageName: document.getElementById('imageName'),
   imageResolution: document.getElementById('imageResolution'),
@@ -110,6 +111,29 @@ const state = {
   resizeState: null,
   altResizing: false,
 };
+
+let canvasResizeObserver = null;
+
+function clearImageSizing() {
+  elements.mainImage.style.width = '';
+  elements.mainImage.style.height = '';
+}
+
+function fitImageToCanvas() {
+  if (!state.naturalSize.width || !state.naturalSize.height || !elements.canvasInner) return;
+
+  const { width: hostWidth, height: hostHeight } = elements.canvasInner.getBoundingClientRect();
+  if (!hostWidth || !hostHeight) return;
+
+  const scale = Math.min(hostWidth / state.naturalSize.width, hostHeight / state.naturalSize.height);
+  if (!Number.isFinite(scale) || scale <= 0) return;
+
+  const displayWidth = Math.max(1, Math.round(state.naturalSize.width * scale));
+  const displayHeight = Math.max(1, Math.round(state.naturalSize.height * scale));
+
+  elements.mainImage.style.width = `${displayWidth}px`;
+  elements.mainImage.style.height = `${displayHeight}px`;
+}
 
 function saveSettings() {
   try {
@@ -439,6 +463,11 @@ function renderSelections() {
   }
 }
 
+function handleLayoutChange() {
+  fitImageToCanvas();
+  renderSelections();
+}
+
 function resetSelections() {
   state.selections = [];
   state.liveRect = null;
@@ -453,6 +482,7 @@ function selectImage(index) {
     elements.mainImage.src = '';
     elements.mainImage.classList.add('hidden');
     state.naturalSize = { width: 0, height: 0 };
+    clearImageSizing();
     resetSelections();
     elements.emptyState.style.display = 'flex';
     refreshThumbs();
@@ -461,11 +491,22 @@ function selectImage(index) {
 
   state.currentIndex = index;
   const item = state.images[index];
+  const nextSrc = toFileUrl(item.path);
+  const isNewImage = elements.mainImage.src !== nextSrc;
+
+  if (isNewImage) {
+    clearImageSizing();
+    state.naturalSize = { width: 0, height: 0 };
+  }
+
   elements.imageName.textContent = item.name;
   elements.mainImage.classList.remove('hidden');
-  elements.mainImage.src = toFileUrl(item.path);
+  elements.mainImage.src = nextSrc;
   elements.emptyState.style.display = 'none';
   resetSelections();
+  if (!isNewImage && state.naturalSize.width && state.naturalSize.height) {
+    handleLayoutChange();
+  }
   refreshThumbs();
 }
 
@@ -833,13 +874,30 @@ function setupImageLoadListener() {
       height: elements.mainImage.naturalHeight,
     };
     elements.imageResolution.textContent = `Resolution: ${state.naturalSize.width} × ${state.naturalSize.height}`;
+    fitImageToCanvas();
     elements.mainImage.classList.remove('hidden');
     renderSelections();
   });
 
   elements.mainImage.addEventListener('error', () => {
+    clearImageSizing();
+    state.naturalSize = { width: 0, height: 0 };
     elements.mainImage.classList.add('hidden');
   });
+}
+
+function setupCanvasResizeObserver() {
+  if (!window.ResizeObserver || !elements.canvasInner) return;
+
+  if (canvasResizeObserver) {
+    canvasResizeObserver.disconnect();
+  }
+
+  canvasResizeObserver = new ResizeObserver(() => {
+    handleLayoutChange();
+  });
+
+  canvasResizeObserver.observe(elements.canvasInner);
 }
 
 function setupEvents() {
@@ -861,7 +919,7 @@ function setupEvents() {
       renderSelections();
     }
   });
-  window.addEventListener('resize', renderSelections);
+  window.addEventListener('resize', handleLayoutChange);
   elements.overlay.addEventListener('dblclick', handleDoubleClick);
   elements.overlay.addEventListener('contextmenu', handleContextDelete);
 
@@ -905,6 +963,7 @@ function init() {
   loadSettings();
   setupEvents();
   setupImageLoadListener();
+  setupCanvasResizeObserver();
   setStatus(state.inputDir, state.outputDir);
   refreshCounts();
 }
